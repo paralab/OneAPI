@@ -48,23 +48,11 @@ int main() {
   std::cout<<"             Computing vector dot product on the gpu_selctor                     "<<std::endl;
   std::cout<<"================================================================================="<<std::endl;
 
+
+  // mannual reduction without using any libraries. 
   {
 
-    // d_queue.submit([&](sycl::handler &cgh) {
-        
-    //     auto dot_ab = _dot_ab_dev.get_access<sycl::access::mode::read_write>(cgh);
-    //     auto a_in   = _vec_a.get_access<sycl::access::mode::read>(cgh);
-    //     auto b_in   = _vec_b.get_access<sycl::access::mode::read>(cgh);
-
-    //     cgh.single_task<class vec_dot>([=]() {
-    //         for(unsigned int idx =0; idx < a_in.get_count(); idx++)
-    //           dot_ab[0] = dot_ab[0] + (a_in[idx] * b_in[idx]);
-    //     });
-
-    // });
-
-
-    sycl::gpu_selector gpu;
+    sycl::default_selector gpu;
     sycl::queue d_queue(gpu);
 
     auto a_size = sycl::range<1>{vec_a.size()};
@@ -79,8 +67,6 @@ int main() {
     auto wgroup_size = 32;
     auto n_wgroups = (a_size/wgroup_size);
     sycl::buffer<VECType, 1> _g_mem(sycl::range<1>{n_wgroups});
-
-
 
     d_queue.submit([&](sycl::handler &cgh) {
         
@@ -124,11 +110,6 @@ int main() {
 
           
         });
-
-        
-
-
-
 
     });
 

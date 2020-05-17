@@ -23,7 +23,7 @@ else
 		sleep 1
 		echo -ne "."
 		((timeout++))
-		if [ $timeout == 40 ]; then
+		if [ $timeout == 100 ]; then
 			echo "TimeOut 40 seconds: Job is queued, check for output file later (*.sh.o)"
 			break
 		fi
