@@ -9,6 +9,8 @@
 #include <CL/sycl.hpp>
 #include "mkl.h"
 #include "mkl_blas_sycl.hpp"
+#include <chrono>
+#include <ctime>
 
 #define SIZE 1024
 namespace sycl = cl::sycl;
@@ -34,9 +36,12 @@ int main()
     std::cout<<"             Computing vector dot product on the host(CPU)                       "<<std::endl;
     std::cout<<"================================================================================="<<std::endl;
 
+    auto t_start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i<SIZE; ++i)
         dot_ab_host = dot_ab_host + (vec_a[i]*vec_b[i]);
 
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::cout<<"time host (mu s): "<<std::chrono::duration_cast<std::chrono::microseconds>(t_end-t_start).count()<<std::endl;
     
     std::cout<<"dot(vec_a,vec_b): "<<dot_ab_host<<std::endl;
 
@@ -58,6 +63,14 @@ int main()
       }
     }
     };
+
+
+    t_start = std::chrono::high_resolution_clock::now();
+    
+    using wall_clock_t = std::chrono::high_resolution_clock;
+    using time_point_t = std::chrono::high_resolution_clock::time_point;
+    std::vector<time_point_t> eventList(2);
+    std::vector<time_point_t> startTimeList(2);
 
     try
     {
@@ -85,6 +98,11 @@ int main()
               << e.what() << std::endl
               << "OpenCL status: " << e.get_cl_code() << std::endl;
     }
+
+    std::cout<<"time device kernel execution (mu s): "<<std::chrono::duration_cast<std::chrono::microseconds>(startTimeList[1]-startTimeList[0]).count()<<std::endl;
+
+    t_end = std::chrono::high_resolution_clock::now();
+    std::cout<<"time device (mu s): "<<std::chrono::duration_cast<std::chrono::microseconds>(t_end-t_start).count()<<std::endl;
     
 
     std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
