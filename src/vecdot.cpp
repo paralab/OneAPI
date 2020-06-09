@@ -53,11 +53,13 @@ int main(int argc, char** argv)
     #pragma novector noparallel nounroll
     for(unsigned int t=0; t < ITER; t++)
     {
+      //DDOT(VEC_SIZE,vec_a.data(),1,vec_b,data(),1);
+      dot_ab_host =cblas_ddot(VEC_SIZE,vec_a.data(),1,vec_b.data(),1);
       //std::cout<<"iter: "<<t<<std::endl;
-      dot_ab_host=0;
-      #pragma novector noparallel nounroll
-      for (int i = 0; i<VEC_SIZE; ++i)
-        dot_ab_host = dot_ab_host + (vec_a[i]*vec_b[i]);
+      //dot_ab_host=0;
+      // #pragma novector noparallel nounroll
+      // for (int i = 0; i<VEC_SIZE; ++i)
+      //   dot_ab_host = dot_ab_host + (vec_a[i]*vec_b[i]);
 
     }
     auto t_end = std::chrono::high_resolution_clock::now();

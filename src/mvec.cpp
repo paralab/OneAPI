@@ -61,12 +61,14 @@ int main(int argc, char** argv)
     for(unsigned int it=0; it< ITER; it++)
     {
 
-      for (unsigned int i = 0; i<SIZE; ++i)
-      {
-          v_host[i]=0;
-          for(unsigned int j = 0; j < SIZE; ++j)
-            v_host[i] += M[i*SIZE + j ] * u[j];
-      }
+      cblas_dgemv(CBLAS_LAYOUT::CblasRowMajor,CBLAS_TRANSPOSE::CblasNoTrans,SIZE,SIZE,1.0,M.data(),SIZE,u.data(),1,0.0,v_host.data(),1);
+
+      // for (unsigned int i = 0; i<SIZE; ++i)
+      // {
+      //     v_host[i]=0;
+      //     for(unsigned int j = 0; j < SIZE; ++j)
+      //       v_host[i] += M[i*SIZE + j ] * u[j];
+      // }
         
     }
 

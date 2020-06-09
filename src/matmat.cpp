@@ -62,16 +62,14 @@ int main(int argc, char** argv)
     for(unsigned int it=0; it < ITER; it++)
     {
 
-      for (unsigned int i = 0; i<SIZE; ++i)
-      for(unsigned int j = 0; j < SIZE; ++j)
-      {
-        C_host[i*SIZE + j] = 0;
-
-        for(unsigned int k=0; k < SIZE; k++)
-          C_host[i*SIZE + j] += A[i*SIZE + k]  + B[k*SIZE + j];
-      }
-       
-
+      cblas_dgemm(CBLAS_LAYOUT::CblasRowMajor,CBLAS_TRANSPOSE::CblasNoTrans,CBLAS_TRANSPOSE::CblasNoTrans,SIZE,SIZE,SIZE,1.0,A.data(),SIZE,B.data(),SIZE,0.0,C_host.data(),SIZE);
+      // for (unsigned int i = 0; i<SIZE; ++i)
+      // for(unsigned int j = 0; j < SIZE; ++j)
+      // {
+      //   C_host[i*SIZE + j] = 0;
+      //   for(unsigned int k=0; k < SIZE; k++)
+      //     C_host[i*SIZE + j] += A[i*SIZE + k]  + B[k*SIZE + j];
+      // }
 
     }
 
