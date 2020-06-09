@@ -1,12 +1,12 @@
 CXX = dpcpp
-CXXFLAGS = -o
+CXXFLAGS = -g -O3 -o
 LDFLAGS = -lOpenCL -lsycl
 EXE_NAME = benchOneAPI
 SOURCES = src/benchOneAPI.cpp
 BINDIR = bin
 
 DPCPP_CXX = dpcpp
-DPCPP_CXXFLAGS = -g -o
+DPCPP_CXXFLAGS = -g -O3 -o
 MKL_CXXFLAGS = -I$(MKLROOT)/include -DMKL_ILP64
 MKL_LDFLAGS = ${MKLROOT}/lib/intel64/libmkl_sycl.a  -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lOpenCL -ldl
 
