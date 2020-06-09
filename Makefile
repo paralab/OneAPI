@@ -8,7 +8,8 @@ BINDIR = bin
 DPCPP_CXX = dpcpp
 DPCPP_CXXFLAGS = -g -O3 -o
 MKL_CXXFLAGS = -I$(MKLROOT)/include -DMKL_ILP64
-MKL_LDFLAGS = ${MKLROOT}/lib/intel64/libmkl_sycl.a  -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lOpenCL -ldl
+#MKL_LDFLAGS = ${MKLROOT}/lib/intel64/libmkl_sycl.a  -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lOpenCL -ldl
+MKL_LDFLAGS = ${MKLROOT}/lib/intel64/libmkl_sycl.a  -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_rt -lmkl_sequential -lmkl_core -lOpenCL -ldl
 
 all: benchOneAPI vdot mvec matmat
 

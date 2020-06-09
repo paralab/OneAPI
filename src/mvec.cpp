@@ -30,6 +30,14 @@ int main(int argc, char** argv)
     const unsigned int CPU_THREADS = atoi(argv[3]);
 
     mkl_set_num_threads(CPU_THREADS);
+    if(CPU_THREADS==1)
+      mkl_set_threading_layer(MKL_THREADING_SEQUENTIAL);
+    else
+      mkl_set_threading_layer(MKL_THREADING_INTEL);
+
+    std::cout<<"SIZE: "<<SIZE<<std::endl;
+    std::cout<<"ITER: "<<ITER<<std::endl;
+    std::cout<<"CPU_THREADS: "<<CPU_THREADS<<std::endl;
     
     double tick_count;
     std::vector<VECType> M;
