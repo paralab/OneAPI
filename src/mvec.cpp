@@ -156,6 +156,16 @@ int main(int argc, char** argv)
     std::cout<<"time device (s): "<<(tick_count/((double)1000))<<std::endl;
     //std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
 
+    std::cout<<"================================================================"<<std::endl;
+    double linf=fabs(v_dev[0]-v_host[0]);
+    for(unsigned int i=1; i < SIZE; i++)
+    {
+      if(linf < fabs(v_dev[i]-v_host[i]))
+        linf=fabs(v_dev[i]-v_host[i]);
+    }
+    std::cout<<"diff(linf): "<<linf<<std::endl;
+    std::cout<<"================================================================"<<std::endl;
+
 
 
 

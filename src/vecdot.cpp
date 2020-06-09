@@ -134,7 +134,11 @@ int main(int argc, char** argv)
     t_end = std::chrono::high_resolution_clock::now();
     tick_count=(std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count());
     std::cout<<"time device (s): "<<(tick_count/((double)1000))<<std::endl;
-    std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
+    //std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
+
+    std::cout<<"================================================================"<<std::endl;
+    std::cout<<"diff(linf): "<<fabs(dot_ab_host-dot_ab_dev)<<std::endl;
+    std::cout<<"================================================================"<<std::endl;
 
 
    return 0;

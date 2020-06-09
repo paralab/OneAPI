@@ -148,7 +148,15 @@ int main(int argc, char** argv)
 
     //std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
 
-
+    std::cout<<"================================================================"<<std::endl;
+    double linf=fabs(C_dev[0]-C_host[0]);
+    for(unsigned int i=1; i < SIZE*SIZE; i++)
+    {
+      if(linf < fabs(C_dev[i]-C_host[i]))
+        linf=fabs(C_dev[i]-C_host[i]);
+    }
+    std::cout<<"diff(linf): "<<linf<<std::endl;
+    std::cout<<"================================================================"<<std::endl;
 
 
 
