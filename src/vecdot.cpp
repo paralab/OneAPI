@@ -95,9 +95,11 @@ int main(int argc, char** argv)
     try
     {
 
-        sycl::default_selector gpu;
+        sycl::gpu_selector gpu;
         sycl::queue d_queue(gpu,asyncHandler);
         std::cout << "Device: "<< d_queue.get_device().get_info<sycl::info::device::name>()<< std::endl;
+        std::cout << "global mem: "<<d_queue.get_device().get_info<sycl::info::device::global_mem_size>()<<std::endl;
+        std::cout << "local  mem: "<<d_queue.get_device().get_info<sycl::info::device::local_mem_size>()<<std::endl;
 
         auto a_size = sycl::range<1>{vec_a.size()};
         auto b_size = sycl::range<1>{vec_b.size()};
@@ -109,7 +111,7 @@ int main(int argc, char** argv)
         sycl::buffer<VECType, 1>  _vec_b(vec_b.data(), b_size);
         sycl::buffer<VECType, 1>  _dot_ab_dev(&dot_ab_dev, dot_ab_size);
 
-        //for(unsigned int t=0; t < ITER; t++)
+        for(unsigned int t=0; t < ITER; t++)
           mkl::blas::dot(d_queue, vec_a.size(), _vec_a, 1, _vec_b, 1, _dot_ab_dev);
 
         d_queue.wait();
@@ -128,7 +130,8 @@ int main(int argc, char** argv)
 
     //std::cout<<"time device kernel execution (s): "<<std::chrono::duration_cast<std::chrono::microseconds>(startTimeList[1]-startTimeList[0]).count()<<std::endl;
     t_end = std::chrono::high_resolution_clock::now();
-    std::cout<<"time device (s): "<<((std::chrono::duration_cast<std::chrono::seconds>(t_end-t_start).count())/((double)ITER))<<std::endl;
+    tick_count=(std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count());
+    std::cout<<"time device (s): "<<(tick_count/((double)1000))<<std::endl;
     std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
 
 
