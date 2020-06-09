@@ -19,26 +19,32 @@ namespace sycl = cl::sycl;
 int main(int argc, char** argv) 
 {
 
-    if(argc < 2)
+    if(argc < 3)
     {
-      std::cout<<"Usage: "<<argv[0]<<" vecSz iter"<<std::endl;
+      std::cout<<"Usage: "<<argv[0]<<" vecSz iter cpu_threads"<<std::endl;
       exit(0);
     }
 
-    const unsigned int VEC_SIZE = atoi(argv[1]);
+    const unsigned int SIZE = atoi(argv[1]);
     const unsigned int ITER = atoi(argv[2]);
+    const unsigned int CPU_THREADS = atoi(argv[3]);
+
+    mkl_set_num_threads(CPU_THREADS);
+
     double tick_count=0;
+
+
 
     std::vector<VECType> vec_a;
     std::vector<VECType> vec_b;
 
-    vec_a.resize(VEC_SIZE);
-    vec_b.resize(VEC_SIZE);
+    vec_a.resize(SIZE);
+    vec_b.resize(SIZE);
 
     VECType dot_ab_dev  = 0.0;
     VECType dot_ab_host = 0.0;
 
-    for (int i = 0; i<VEC_SIZE; ++i)
+    for (int i = 0; i<SIZE; ++i)
     {
         vec_a[i] = 1.0;
         vec_b[i] = 1.0;
@@ -54,7 +60,7 @@ int main(int argc, char** argv)
     for(unsigned int t=0; t < ITER; t++)
     {
       //DDOT(VEC_SIZE,vec_a.data(),1,vec_b,data(),1);
-      dot_ab_host =cblas_ddot(VEC_SIZE,vec_a.data(),1,vec_b.data(),1);
+      dot_ab_host =cblas_ddot(SIZE,vec_a.data(),1,vec_b.data(),1);
       //std::cout<<"iter: "<<t<<std::endl;
       //dot_ab_host=0;
       // #pragma novector noparallel nounroll

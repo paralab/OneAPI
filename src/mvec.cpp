@@ -19,24 +19,26 @@ namespace sycl = cl::sycl;
 int main(int argc, char** argv) 
 {
 
-    if(argc < 2)
+    if(argc < 3)
     {
-      std::cout<<"Usage: "<<argv[0]<<" mat(sz) iter"<<std::endl;
+      std::cout<<"Usage: "<<argv[0]<<" vecSz iter cpu_threads"<<std::endl;
       exit(0);
-    }  
+    }
 
-    const unsigned int MAT_SZ = atoi(argv[1]);
-    const unsigned int ITER   = atoi(argv[2]); 
+    const unsigned int SIZE = atoi(argv[1]);
+    const unsigned int ITER = atoi(argv[2]);
+    const unsigned int CPU_THREADS = atoi(argv[3]);
+
+    mkl_set_num_threads(CPU_THREADS);
+    
     double tick_count;
-
-    const unsigned int SIZE = MAT_SZ;
     std::vector<VECType> M;
     std::vector<VECType> u;
 
     std::vector<VECType> v_host;
     std::vector<VECType> v_dev;
 
-    M.resize(MAT_SZ*MAT_SZ);
+    M.resize(SIZE*SIZE);
     u.resize(SIZE);
 
     v_dev.resize(SIZE);

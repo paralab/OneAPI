@@ -19,14 +19,17 @@ namespace sycl = cl::sycl;
 int main(int argc, char** argv) 
 {
 
-    if(argc < 2)
+   if(argc < 3)
     {
-      std::cout<<"Usage: "<<argv[0]<<" mat(sz) iter"<<std::endl;
+      std::cout<<"Usage: "<<argv[0]<<" vecSz iter cpu_threads"<<std::endl;
       exit(0);
-    }  
+    }
 
     const unsigned int SIZE = atoi(argv[1]);
-    const unsigned int ITER   = atoi(argv[2]); 
+    const unsigned int ITER = atoi(argv[2]);
+    const unsigned int CPU_THREADS = atoi(argv[3]);
+
+    mkl_set_num_threads(CPU_THREADS);
     double tick_count;
 
     std::vector<VECType> A;
@@ -56,6 +59,7 @@ int main(int argc, char** argv)
     std::cout<<"================================================================================="<<std::endl;
     std::cout<<"             Computing mat-mat product on the host(CPU)                       "<<std::endl;
     std::cout<<"================================================================================="<<std::endl;
+    
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
