@@ -1,0 +1,131 @@
+\documentclass[]{report}   % list options between brackets
+\usepackage{}              % list packages between braces
+\usepackage{pgfplots}
+\usepackage{float}
+% type user-defined commands here
+
+\begin{document}
+
+\title{Evaluation of Intel One API Beta Version}   % type title between braces
+\author{Milinda Fernando}         % type author(s) between braces
+\date{June 12, 2020}    % type date between braces
+\maketitle
+
+\begin{abstract}
+  This document presents performance evaluation of Intel's OneAPI in heterogeneous compute environment. We focus on three kernel, vector dot product (BLAS level 1), matrix-vector (BLAS level 2) and matrix-matrix (BLAS level 3) product using Intel's MKL implementation for GPU and CPUs. Currently, OneAPI beta version support is limited to Intel GPUs only. 
+\end{abstract}
+
+\section{Experimental Setup}
+Presented experiments were conducted on Intel's developer cloud facility. 
+
+
+\begin{verbatim}
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              12
+On-line CPU(s) list: 0-11
+Thread(s) per core:  2
+Core(s) per socket:  6
+Socket(s):           1
+NUMA node(s):        1
+Vendor ID:           GenuineIntel
+CPU family:          6
+Model:               158
+Model name:          Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz
+Stepping:            10
+CPU MHz:             1100.033
+CPU max MHz:         4000.0000
+CPU min MHz:         800.0000
+BogoMIPS:            7392.00
+Virtualization:      VT-x
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            256K
+L3 cache:            12288K
+NUMA node0 CPU(s):   0-11
+\end{verbatim}  
+
+From Sycl, this is the GPU info used at the runtime. 
+
+\begin{verbatim}
+
+Device: Intel(R) Gen9 HD Graphics NEO
+global mem: 53882437632
+local  mem: 65536
+
+\end{verbatim}
+
+\newpage
+\section{Results}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	symbolic x coords={1M,10M,100M},
+	xtick=data,
+	nodes near coords,
+	nodes near coords align={vertical},
+	legend pos= outer north east,
+	width =8cm,height=5cm
+	]
+	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_1.dat};
+	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_1.dat};
+	\legend{MKL(CPU),MKL(GPU)}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Performance comparison of Intel's OneMKL for BLAS 1 dot product routine}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	symbolic x coords={1K,5K,10K,20K},
+	xtick=data,
+	nodes near coords,
+	nodes near coords align={vertical},
+	legend pos= outer north east,
+	width =8cm, height=5cm
+	]
+	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_2.dat};
+	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_2.dat};
+	\legend{MKL(CPU),MKL(GPU)}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Performance comparison of Intel's OneMKL for BLAS 2 dense mat-vec product routine}
+\end{figure}
+
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	symbolic x coords={1K,2K,3K,3.5K},
+	xtick=data,
+	nodes near coords,
+	nodes near coords align={vertical},
+	legend pos= outer north east,
+	width =8cm,height=5cm
+	]
+	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_3.dat};
+	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_3.dat};
+	\legend{MKL(CPU),MKL(GPU)}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Performance comparison of Intel's OneMKL for BLAS 3 dense matrix-matrix product routine}
+\end{figure}
+
+
+
+%\begin{thebibliography}{9}
+  % type bibliography here
+%\end{thebibliography}
+
+\end{document}
