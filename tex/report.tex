@@ -69,7 +69,9 @@ local  mem: 65536
 	nodes near coords,
 	nodes near coords align={vertical},
 	legend pos= outer north east,
-	width =8cm,height=5cm
+	xlabel = {input size $\rightarrow$ },
+	ylabel = {time(s)$\rightarrow$},
+	width =8cm,height=4.5cm
 	]
 	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_1.dat};
 	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_1.dat};
@@ -90,7 +92,9 @@ local  mem: 65536
 	nodes near coords,
 	nodes near coords align={vertical},
 	legend pos= outer north east,
-	width =8cm, height=5cm
+	xlabel = {input size $\rightarrow$ },
+	ylabel = {time(s)$\rightarrow$},
+	width =8cm, height=4.5cm
 	]
 	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_2.dat};
 	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_2.dat};
@@ -112,7 +116,9 @@ local  mem: 65536
 	nodes near coords,
 	nodes near coords align={vertical},
 	legend pos= outer north east,
-	width =8cm,height=5cm
+	xlabel = {input size $\rightarrow$ },
+	ylabel = {time(s)$\rightarrow$},
+	width =8cm,height=4.5cm
 	]
 	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {mkl_seq}]{dat/blas_3.dat};
 	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev(s)}]{dat/blas_3.dat};
@@ -120,6 +126,29 @@ local  mem: 65536
 	\end{axis}
 	\end{tikzpicture}
 	\caption{Performance comparison of Intel's OneMKL for BLAS 3 dense matrix-matrix product routine}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\begin{axis}[
+	ybar,
+	symbolic x coords={100,500,1000},
+	xtick=data,
+	nodes near coords,
+	nodes near coords align={vertical},
+	legend pos= outer north east,
+	xlabel = {input size $\rightarrow$ },
+	ylabel = {time(s)$\rightarrow$},
+	width =8cm,height=4.5cm
+	]
+	\addplot [fill=blue!50, fill opacity=0.5] [bar shift=-.2cm] table[x={inSz}, y = {seq}]{dat/blas3_hw.dat};
+	\addplot [fill=red!50, fill opacity=0.5] [bar shift=.2cm] table[x={inSz}, y = {dev}]{dat/blas3_hw.dat};
+	\legend{CPU,GPU}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Performance comparison of handwritten code for BLAS 3 dense matrix-matrix product routine}
 \end{figure}
 
 
