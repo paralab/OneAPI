@@ -157,7 +157,104 @@ int main(int argc, char** argv)
 
     t_end = std::chrono::high_resolution_clock::now();
     tick_count=(std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count());
-    std::cout<<"time device (s): "<<(tick_count/((double)1000))<<std::endl;
+    std::cout<<"time device mkl (s): "<<(tick_count/((double)1000))<<std::endl;
+
+    try
+    {
+      
+      sycl::gpu_selector gpu;
+      sycl::queue d_queue(gpu,asyncHandler);
+      std::cout << "Device: "<< d_queue.get_device().get_info<sycl::info::device::name>()<< std::endl;
+      std::cout << "global mem: "<<d_queue.get_device().get_info<sycl::info::device::global_mem_size>()<<std::endl;
+      std::cout << "local  mem: "<<d_queue.get_device().get_info<sycl::info::device::local_mem_size>()<<std::endl;
+
+      auto num_groups = d_queue.get_device().get_info<cl::sycl::info::device::max_compute_units>();
+      auto work_group_size = d_queue.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+      auto total_threads = num_groups * work_group_size;
+
+      std::cout<<" max compute units : "<<num_groups<<std::endl;
+      std::cout<<" work group size : "<<work_group_size<<std::endl;
+      std::cout<<" total threads : "<<total_threads<<std::endl;
+
+      auto A_size = sycl::range<1>{A.size()};
+      auto B_size = sycl::range<1>{B.size()};
+      auto C_size = sycl::range<1>{C_dev.size()};
+
+      auto th_1d =0; 
+
+      if(total_threads < SIZE*SIZE)
+      {
+          th_1d = (int)sqrt(total_threads);
+      }else
+      {
+        th_1d=SIZE;
+      }
+
+      std::cout<<"lunch ker size : ("<<th_1d<<", "<<th_1d<<")"<<std::endl;
+      sycl::buffer<VECType, 1>  _A(A.data(), A_size);
+      sycl::buffer<VECType, 1>  _B(B.data(), B_size);
+      sycl::buffer<VECType, 1>  _C(C_dev.data(), C_size);
+
+      t_start = std::chrono::high_resolution_clock::now();//startTimeList.at(0) = wall_clock_t::now();
+      for(unsigned int it=0; it < ITER; it++)
+      {
+
+        A[0]=0;
+        B[0]=0;
+
+        //std::cout<<"iter: "<<it<<std::endl;
+        d_queue.submit([&](sycl::handler &cgh) {
+      
+        auto a_in   = _A.get_access<sycl::access::mode::read>(cgh);
+        auto b_in   = _B.get_access<sycl::access::mode::read>(cgh);
+        auto c_in   = _C.get_access<sycl::access::mode::write>(cgh);
+        sycl::stream out(1024, 256, cgh);
+
+        
+        cgh.parallel_for<class gemm>(sycl::range<2>(th_1d,th_1d), [=] (sycl::item<2> item) {
+          
+          auto rid = item.get_id(0);
+          auto cid = item.get_id(1);
+
+          //out<<"id: "<<id<<sycl::endl;
+          // for(unsigned int i=0; i < SIZE; i++)
+          //   out<<id<<" a_in row : "<<a_in[id*SIZE + i]<<sycl::endl;
+
+          for (unsigned int i = ((rid*SIZE)/th_1d) ; i < ((rid+1)*SIZE)/th_1d ; i++ )
+          for (unsigned int j = ((cid*SIZE)/th_1d) ; j < ((cid+1)*SIZE)/th_1d ; j++ )
+          {
+              VECType tmp=0;
+              for(unsigned int k=0; k < SIZE; k++)
+                tmp+= a_in[i*SIZE+k]*b_in[k*SIZE + j];
+
+              c_in[i*SIZE + j] = tmp;
+          }
+
+                    
+          
+          });
+
+        });
+        
+      }
+      d_queue.wait();
+      startTimeList.at(1) = wall_clock_t::now();
+
+
+
+    }
+    catch (cl::sycl::exception const &e) 
+    {
+        std::cout << "\t\tSYCL exception during GEMM\n"
+              << e.what() << std::endl
+              << "OpenCL status: " << e.get_cl_code() << std::endl;
+    }
+    t_end = std::chrono::high_resolution_clock::now();
+    tick_count=(std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count());
+    std::cout<<"time device without mkl (s): "<<(tick_count/((double)1000))<<std::endl;
+
+
+
 
     //std::cout<<"dot(vec_a,vec_b): "<<dot_ab_dev<<std::endl;
 
