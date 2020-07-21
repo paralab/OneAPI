@@ -180,35 +180,65 @@ int main(int argc, char** argv)
       auto B_size = sycl::range<1>{B.size()};
       auto C_size = sycl::range<1>{C_dev.size()};
 
-      if(total_threads > A_size)
-       total_threads=A_size;
+      auto th_1d =0; 
 
+      if(total_threads < SIZE*SIZE)
+      {
+          th_1d = (int)sqrt(total_threads);
+      }else
+      {
+        th_1d=SIZE;
+      }
+
+      std::cout<<"lunch ker size : ("<<th_1d<<", "<<th_1d<<")"<<std::endl;
       sycl::buffer<VECType, 1>  _A(A.data(), A_size);
       sycl::buffer<VECType, 1>  _B(B.data(), B_size);
       sycl::buffer<VECType, 1>  _C(C_dev.data(), C_size);
 
-      d_queue.submit([&](sycl::handler &cgh) {
+      t_start = std::chrono::high_resolution_clock::now();//startTimeList.at(0) = wall_clock_t::now();
+      for(unsigned int it=0; it < ITER; it++)
+      {
+
+        A[0]=0;
+        B[0]=0;
+
+        //std::cout<<"iter: "<<it<<std::endl;
+        d_queue.submit([&](sycl::handler &cgh) {
       
         auto a_in   = _A.get_access<sycl::access::mode::read>(cgh);
         auto b_in   = _B.get_access<sycl::access::mode::read>(cgh);
         auto c_in   = _C.get_access<sycl::access::mode::write>(cgh);
+        sycl::stream out(1024, 256, cgh);
 
-
-        cgh.parallel_for<class gemm>(sycl::range<1>(total_threads), [=] (sycl::nd_item<1> item) {
+        
+        cgh.parallel_for<class gemm>(sycl::range<2>(th_1d,th_1d), [=] (sycl::item<2> item) {
           
-          auto id = itemId.get_id(0);
-          
+          auto rid = item.get_id(0);
+          auto cid = item.get_id(1);
 
-          VECType tmp=0;
-          for(unsigned int i=0; i < SIZE; i++)
-            temp+= A[id*SIZE+i]*B[i*SIZE + id];
+          //out<<"id: "<<id<<sycl::endl;
+          // for(unsigned int i=0; i < SIZE; i++)
+          //   out<<id<<" a_in row : "<<a_in[id*SIZE + i]<<sycl::endl;
 
-          c_in[id] =tmp;          
+          for (unsigned int i = ((rid*SIZE)/th_1d) ; i < ((rid+1)*SIZE)/th_1d ; i++ )
+          for (unsigned int j = ((cid*SIZE)/th_1d) ; j < ((cid+1)*SIZE)/th_1d ; j++ )
+          {
+              VECType tmp=0;
+              for(unsigned int k=0; k < SIZE; k++)
+                tmp+= a_in[i*SIZE+k]*b_in[k*SIZE + j];
+
+              c_in[i*SIZE + j] = tmp;
+          }
+
+                    
           
+          });
+
         });
-
-      });
-
+        
+      }
+      d_queue.wait();
+      startTimeList.at(1) = wall_clock_t::now();
 
 
 
@@ -219,7 +249,9 @@ int main(int argc, char** argv)
               << e.what() << std::endl
               << "OpenCL status: " << e.get_cl_code() << std::endl;
     }
-
+    t_end = std::chrono::high_resolution_clock::now();
+    tick_count=(std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count());
+    std::cout<<"time device without mkl (s): "<<(tick_count/((double)1000))<<std::endl;
 
 
 
